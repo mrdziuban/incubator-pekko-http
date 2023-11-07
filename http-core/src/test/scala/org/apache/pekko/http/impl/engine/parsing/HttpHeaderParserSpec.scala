@@ -141,6 +141,20 @@ abstract class HttpHeaderParserSpec(mode: String, newLine: String) extends Pekko
         HttpCookie("tralala", "cookie-value-here"))
     }
 
+    "parse and cache a Cookie header with no spaces after a semicolon" in new TestSetup() {
+      parseAndCache(s"Cookie: foo=bar;baz=quux${newLine}x")() shouldEqual Cookie(
+        "foo" -> "bar",
+        "baz" -> "quux",
+      )
+    }
+
+    "parse and cache a Cookie header with multiple spaces after a semicolon" in new TestSetup() {
+      parseAndCache(s"Cookie: foo=bar;  baz=quux${newLine}x")() shouldEqual Cookie(
+        "foo" -> "bar",
+        "baz" -> "quux",
+      )
+    }
+
     "parse and cache an invalid modelled header as RawHeader" in new TestSetup() {
       parseAndCache(s"Content-Type: abc:123${newLine}x")() shouldEqual RawHeader("content-type", "abc:123")
       parseAndCache(s"Origin: localhost:8080${newLine}x")() shouldEqual RawHeader("origin", "localhost:8080")
